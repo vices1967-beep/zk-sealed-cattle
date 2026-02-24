@@ -47,7 +47,6 @@
     "blo": "^1.1.1",
     "circomlibjs": "^0.1.7",
     "ethers": "^6.12.0",
-    "garaga": "^1.0.1",
     "get-starknet-core": "^4.0.0",
     "minimatch": "^10.0.0",
     "next": "15.2.8",
