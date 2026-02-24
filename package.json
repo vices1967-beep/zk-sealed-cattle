@@ -47,8 +47,10 @@
   },
   "dependencies": {
     "@aztec/bb.js": "0.87.0",
+    "@cavos/react": "^1.1.1",
     "@scure/starknet": "^2.0.0",
     "micro-starknet": "^0.2.3",
-    "postcss": "^8.4.38"
+    "postcss": "^8.4.38",
+    "starknet": "^9.2.1"
   }
 }

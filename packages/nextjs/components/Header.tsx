@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useCallback, useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -12,7 +12,8 @@ import { useTargetNetwork } from "~~/hooks/scaffold-stark/useTargetNetwork";
 import { devnet } from "@starknet-react/chains";
 import { SwitchTheme } from "./SwitchTheme";
 import { useAccount, useNetwork, useProvider } from "@starknet-react/core";
-import { BlockIdentifier } from "starknet";
+import { useCavos } from '@cavos/react';
+import { CavosLoginButton } from "./CavosLoginButton";
 
 type HeaderMenuLink = {
   label: string;
@@ -65,9 +66,6 @@ export const HeaderMenuLinks = () => {
   );
 };
 
-/**
- * Site header
- */
 export const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const burgerMenuRef = useRef<HTMLDivElement>(null);
@@ -81,19 +79,20 @@ export const Header = () => {
   const isLocalNetwork = targetNetwork.network === devnet.network;
 
   const { provider } = useProvider();
-  const { address, status, chainId } = useAccount();
+  const { address: walletAddress, status, chainId } = useAccount();
   const { chain } = useNetwork();
+  const { isAuthenticated: isCavosAuth, address: cavosAddress } = useCavos();
   const [isDeployed, setIsDeployed] = useState(true);
 
   useEffect(() => {
     if (
       status === "connected" &&
-      address &&
+      walletAddress &&
       chainId === targetNetwork.id &&
       chain.network === targetNetwork.network
     ) {
       provider
-        .getClassHashAt(address)
+        .getClassHashAt(walletAddress)
         .then((classHash) => {
           if (classHash) setIsDeployed(true);
           else setIsDeployed(false);
@@ -107,13 +106,16 @@ export const Header = () => {
     }
   }, [
     status,
-    address,
+    walletAddress,
     provider,
     chainId,
     targetNetwork.id,
     targetNetwork.network,
     chain.network,
   ]);
+
+  const hasWallet = !!walletAddress;
+  const hasCavos = isCavosAuth && !!cavosAddress;
 
   return (
     <div className=" lg:static top-0 navbar min-h-0 shrink-0 justify-between z-20 px-0 sm:px-2">
@@ -172,8 +174,14 @@ export const Header = () => {
             Wallet Not Deployed
           </span>
         ) : null}
-        <CustomConnectButton />
-        {/* <FaucetButton /> */}
+        {/* Contenedor para Cavos: deshabilitado si hay wallet conectada */}
+        <div className={hasWallet ? "opacity-50 pointer-events-none" : ""}>
+          <CavosLoginButton />
+        </div>
+        {/* Contenedor para wallet: deshabilitado si hay Cavos conectada */}
+        <div className={hasCavos ? "opacity-50 pointer-events-none" : ""}>
+          <CustomConnectButton />
+        </div>
         <SwitchTheme
           className={`pointer-events-auto ${
             isLocalNetwork ? "mb-1 lg:mb-0" : ""
