@@ -2,7 +2,7 @@
 "use client";
 
 import { useAccount, useContract, useProvider } from "@starknet-react/core";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { poseidonHashMany } from "micro-starknet";
 import toast from "react-hot-toast";
 import deployedContracts from "~~/contracts/deployedContracts";
@@ -23,6 +23,9 @@ interface LotMetadata {
   imagenes?: string[];
   descripcion?: string;
 }
+
+// IPFS Gateway configuration (from environment)
+const IPFS_GATEWAY = process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud';
 
 /**
  * Converts any address-like value to a 64-character hex string prefixed with 0x.
@@ -225,7 +228,7 @@ export default function Home() {
    * Fetches all lots from the contract.
    * @param showRefreshing - Whether to show the refreshing spinner
    */
-  const fetchAllLots = async (showRefreshing = false) => {
+  const fetchAllLots = useCallback(async (showRefreshing = false) => {
     if (!contract) return;
     if (showRefreshing) setRefreshing(true);
     else setLoadingLots(true);
@@ -242,7 +245,7 @@ export default function Home() {
 
           if (metadataUri.startsWith("ipfs://")) {
             const cid = metadataUri.replace("ipfs://", "");
-            const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${cid}`;
+            const gatewayUrl = `${IPFS_GATEWAY}/ipfs/${cid}`; // Use configured gateway
             try {
               const res = await fetch(gatewayUrl);
               if (res.ok) metadata = await res.json();
@@ -280,11 +283,11 @@ export default function Home() {
       setLoadingLots(false);
       setRefreshing(false);
     }
-  };
+  }, [contract, setRefreshing, setLoadingLots, setNextLotId, setLots, toHexAddress, toast, IPFS_GATEWAY]);
 
   useEffect(() => {
     fetchAllLots();
-  }, [contract, activeAccountAddress]);
+  }, [fetchAllLots, contract, activeAccountAddress]); // Added fetchAllLots to dependencies
 
   /**
    * Handles selection of a lot.
