@@ -222,7 +222,7 @@ lot_id = 18
 
 #### ***Selection Circuit Flow***
 
-```
+```mermaid
 graph TD
     subgraph "Inputs (up to 8 bids)"
         B1["Bid 1: {amount, nonce, bidder, lot_id}"]
@@ -260,11 +260,20 @@ graph TD
     V --> PW
     V --> PA
     V --> P
+
+    style B1 fill:#f9f,stroke:#333,stroke-width:2px
+    style B2 fill:#f9f,stroke:#333,stroke-width:2px
+    style B8 fill:#f9f,stroke:#333,stroke-width:2px
+    style VB fill:#ccf,stroke:#333,stroke-width:2px
+    style LID fill:#ccf,stroke:#333,stroke-width:2px
+    style PW fill:#cfc,stroke:#333,stroke-width:2px
+    style PA fill:#cfc,stroke:#333,stroke-width:2px
+    style P fill:#cfc,stroke:#333,stroke-width:2px
 ```
 
 #### ***Payment Circuit Flow***
 
-```
+```mermaid
 graph TD
     subgraph "Inputs"
         S["secret (nonce)"]
@@ -288,6 +297,13 @@ graph TD
     W --> H
     H --> C
     H --> P
+
+    style S fill:#f9f,stroke:#333,stroke-width:2px
+    style AL fill:#f9f,stroke:#333,stroke-width:2px
+    style LL fill:#f9f,stroke:#333,stroke-width:2px
+    style W fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#cfc,stroke:#333,stroke-width:2px
+    style P fill:#cfc,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -298,7 +314,7 @@ graph TD
 
 ### ***7.1 Flow Diagram***
 
-```
+```mermaid
 sequenceDiagram
     participant User
     participant Frontend (Next.js)
