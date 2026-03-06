@@ -506,7 +506,7 @@ const deployedContracts = {
   sepolia: {
     SealedBidFeedlot: {
       address:
-        "0x3d64343fe5fd52d4e760067a4c919cadc10f464dbef01911f6cb8f549058867",
+        "0x2d3e13329051c4c6914e05c06137fd9376fe335285ca4084c6ee44a7c7f05eb",
       abi: [
         {
           type: "impl",
