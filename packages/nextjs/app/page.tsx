@@ -1120,7 +1120,7 @@ Caller: ${debugInfo.caller}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
-              className="input input-bordered bg-gray-100"
+              className="input input-bordered"  // Se eliminó la clase bg-gray-100
               placeholder="Lot ID (auto)"
               value={nextLotId}
               readOnly
@@ -1446,7 +1446,7 @@ Caller: ${debugInfo.caller}
                 <div className="space-y-4">
                   <input
                     type="text"
-                    className="input input-bordered w-full bg-gray-100"
+                    className="input input-bordered w-full"
                     placeholder="Nonce (reveal)"
                     value={nonce}
                     readOnly
