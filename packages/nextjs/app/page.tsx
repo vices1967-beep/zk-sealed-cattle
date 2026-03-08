@@ -957,6 +957,7 @@ Caller: ${debugInfo.caller}
    * Finalizes a lot using a dynamic ZK proof (owner only).
    * Calls finalize_with_zk on the main contract.
    */
+
   const handleFinalizeWithZK = async () => {
     console.log("🚀 handleFinalizeWithZK started");
     
@@ -977,27 +978,28 @@ Caller: ${debugInfo.caller}
     const startTime = Date.now();
 
     try {
-      // Get revealed bids from the contract instead of localStorage
-      console.log("📦 Fetching revealed bids from contract...");
-      const revealedBidsFromContract = await contractRef.current.get_revealed_bids(selectedLotId);
+      // 1. Obtener los bids revelados directamente del contrato (nueva función)
+      console.log("📦 Fetching revealed bids from contract for lot", selectedLotId);
+      const revealedBids = await contractRef.current.get_revealed_bids(selectedLotId);
       
-      if (!revealedBidsFromContract || revealedBidsFromContract.length === 0) {
-        toast.error("No revealed bids found in contract for this lot");
+      if (!revealedBids || revealedBids.length === 0) {
+        toast.error("No revealed bids in this lot");
         setIsLoading(false);
         return;
       }
 
-      // Convert contract bid format to the format expected by the backend
-      const allBids: Bid[] = revealedBidsFromContract.map((bid: any) => ({
+      // Convertir a formato Bid (similar al que espera el backend)
+      const allBids: Bid[] = revealedBids.map((bid: any) => ({
         secret: bid[2].toString(), // nonce
         amount: bid[1].toString(),  // amount
         lot_id: selectedLotId,
-        winner: toHexAddress(bid[0]), // bidder address
-        commitment: '', // Not needed for the selection circuit (already verified on reveal)
+        winner: toHexAddress(bid[0]), // bidder
+        commitment: '', // No es necesario para el circuito de selección
       }));
 
-      console.log(`📦 Found ${allBids.length} revealed bids`);
+      console.log(`📦 Found ${allBids.length} bids from contract`);
 
+      // 2. Llamar al backend para generar la prueba ZK
       const BACKEND_URL = '/api/zk-proof';
       toast.loading("Generating ZK proof via backend...");
       console.log("🌐 Sending request to backend...");
@@ -1017,13 +1019,18 @@ Caller: ${debugInfo.caller}
       console.log("✅ Calldata received, length:", calldata.length);
       toast.dismiss();
 
-      const winner = selectedLotInfo.mejor_postor;
-      const winnerAmount = selectedLotInfo.mejor_puja;
+      // 3. Obtener la información más reciente del lote (ganador actual)
+      const latestInfo = await contractRef.current.get_lot_info(selectedLotId);
+      const winner = latestInfo.mejor_postor;
+      const winnerAmount = latestInfo.mejor_puja?.toString() || "0";
 
       if (!winner || winner === '0x0' || winnerAmount === '0') {
         throw new Error("No winner determined yet");
       }
 
+      console.log("🏆 Winner from contract:", { winner: toHexAddress(winner), winnerAmount });
+
+      // 4. Enviar la transacción de finalización con ZK
       toast.loading("Submitting ZK proof to contract...");
       console.log("⛓️ Calling finalize_with_zk...");
       
@@ -1056,6 +1063,7 @@ Caller: ${debugInfo.caller}
       toast.dismiss();
       toast.success("✅ Lot finalized with ZK proof!");
 
+      // 5. Actualizar el estado local
       const updatedInfo = await contractRef.current.get_lot_info(selectedLotId);
       const updatedLot = {
         id: selectedLotInfo.id,
@@ -1384,7 +1392,7 @@ Caller: ${debugInfo.caller}
             <div className="text-sm mt-2">
               <strong>Registered winner:</strong>{" "}
               <span className="tooltip" data-tip={selectedLotInfo.winnerRecord.address}>
-                {selectedLotInfo.winnerRecord.address.slice(0, 10)}... ({selectedLotInfo.winnerRecord.amount} STRK)
+                {selectedLotInfo.winnerRecord.address.slice(0, 10)}... ({selectedLotInfo.winnerRecord.amount} USD)
               </span>
             </div>
           )}
