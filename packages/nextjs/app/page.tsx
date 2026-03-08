@@ -977,16 +977,26 @@ Caller: ${debugInfo.caller}
     const startTime = Date.now();
 
     try {
-      console.log("📦 Fetching bids from localStorage...");
-      const allBids: Bid[] = JSON.parse(
-        localStorage.getItem(`bids_${selectedLotId}`) || '[]'
-      );
-      console.log(`📦 Found ${allBids.length} bids`);
-      if (allBids.length === 0) {
-        toast.error("No bids in this lot");
+      // Get revealed bids from the contract instead of localStorage
+      console.log("📦 Fetching revealed bids from contract...");
+      const revealedBidsFromContract = await contractRef.current.get_revealed_bids(selectedLotId);
+      
+      if (!revealedBidsFromContract || revealedBidsFromContract.length === 0) {
+        toast.error("No revealed bids found in contract for this lot");
         setIsLoading(false);
         return;
       }
+
+      // Convert contract bid format to the format expected by the backend
+      const allBids: Bid[] = revealedBidsFromContract.map((bid: any) => ({
+        secret: bid[2].toString(), // nonce
+        amount: bid[1].toString(),  // amount
+        lot_id: selectedLotId,
+        winner: toHexAddress(bid[0]), // bidder address
+        commitment: '', // Not needed for the selection circuit (already verified on reveal)
+      }));
+
+      console.log(`📦 Found ${allBids.length} revealed bids`);
 
       const BACKEND_URL = '/api/zk-proof';
       toast.loading("Generating ZK proof via backend...");
