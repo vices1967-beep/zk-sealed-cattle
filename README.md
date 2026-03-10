@@ -372,7 +372,7 @@ graph TD
 
 ### **6.4 Acknowledgements**
 
-The ZK circuits and the logic for dynamic proof generation in this project are deeply inspired by the excellent work of [Omar Espejel](https://github.com/od-hunter) and his [Starknet Privacy Toolkit](https://github.com/od-hunter/starknet-privacy-toolkit). His toolkit provided the foundational patterns and a clear path for implementing privacy-preserving mechanisms on Starknet. We extend our sincere gratitude to Omar for his invaluable contributions to the ecosystem and for his personal guidance and support in troubleshooting the backend proof service, ensuring it functioned correctly and efficiently.
+The ZK circuits and the logic for dynamic proof generation in this project are deeply inspired by the excellent work of [Omar Espejel](https://github.com/omarespejel) and his [Starknet Privacy Toolkit](https://github.com/omarespejel/starknet-privacy-toolkit). His toolkit provided the foundational patterns and a clear path for implementing privacy-preserving mechanisms on Starknet. We extend our sincere gratitude to Omar for his invaluable contributions to the ecosystem and for his personal guidance and support in troubleshooting the backend proof service, ensuring it functioned correctly and efficiently.
 
 ---
 
