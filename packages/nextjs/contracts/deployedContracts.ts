@@ -403,6 +403,22 @@ const deployedContracts = {
               ],
               state_mutability: "view",
             },
+            {
+              type: "function",
+              name: "get_revealed_bids",
+              inputs: [
+                {
+                  name: "lot_id",
+                  type: "core::integer::u256",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u256, core::felt252)>",
+                },
+              ],
+              state_mutability: "view",
+            },
           ],
         },
         {
@@ -506,7 +522,7 @@ const deployedContracts = {
   sepolia: {
     SealedBidFeedlot: {
       address:
-        "0x2d3e13329051c4c6914e05c06137fd9376fe335285ca4084c6ee44a7c7f05eb",
+        "0x2eecc60f54fc87be7db63e19f0291b43ce403258ba674bf6bc221601376194",
       abi: [
         {
           type: "impl",
@@ -902,6 +918,22 @@ const deployedContracts = {
               ],
               state_mutability: "view",
             },
+            {
+              type: "function",
+              name: "get_revealed_bids",
+              inputs: [
+                {
+                  name: "lot_id",
+                  type: "core::integer::u256",
+                },
+              ],
+              outputs: [
+                {
+                  type: "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u256, core::felt252)>",
+                },
+              ],
+              state_mutability: "view",
+            },
           ],
         },
         {
@@ -999,7 +1031,7 @@ const deployedContracts = {
         },
       ],
       classHash:
-        "0x74fd418435667ae1b228d33284b517fcacc76eb3ba80a6347b71e279614d25a",
+        "0x60d7092e8b2b4d111d757093f4d6dcc7b3cc329b60199f6fa6a3e33a1cc7071",
     },
   },
 } as const;

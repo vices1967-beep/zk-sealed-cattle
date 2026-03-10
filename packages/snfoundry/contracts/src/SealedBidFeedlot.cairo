@@ -51,6 +51,8 @@ pub trait ISealedBidFeedlot<TContractState> {
     fn get_winner(self: @TContractState, lot_id: u256) -> (ContractAddress, u256);
     // Debug function
     fn debug_reveal(self: @TContractState, lot_id: u256, amount: u256, nonce: felt252) -> (felt252, felt252, ContractAddress, ContractAddress);
+    // New function to retrieve all revealed bids for a lot
+    fn get_revealed_bids(self: @TContractState, lot_id: u256) -> Array<(ContractAddress, u256, felt252)>;
 }
 
 // Interface for the auction verifier (used in finalize_with_zk)
@@ -83,6 +85,9 @@ mod SealedBidFeedlot {
         payment_done: Map<u256, bool>,
         // Winner registry (address and amount)
         winner_record: Map<u256, (ContractAddress, u256)>,
+        // Storage for all revealed bids per lot
+        revealed_bids: Map<(u256, u32), (ContractAddress, u256, felt252)>,
+        revealed_bids_count: Map<u256, u32>,
     }
 
     #[constructor]
@@ -173,6 +178,11 @@ mod SealedBidFeedlot {
                 updated_lot.mejor_postor = caller;
                 self.lots.write(lot_id, updated_lot);
             }
+
+            // Store the revealed bid for future reference (e.g., for ZK proof generation)
+            let count = self.revealed_bids_count.read(lot_id);
+            self.revealed_bids.write((lot_id, count), (caller, amount, nonce));
+            self.revealed_bids_count.write(lot_id, count + 1);
         }
 
         fn finalize_lot(ref self: ContractState, lot_id: u256) {
@@ -315,6 +325,19 @@ mod SealedBidFeedlot {
             let stored = self.commitments.read((account_address, lot_id));
             
             (computed, stored, account_address, caller)
+        }
+
+        // New function to retrieve all revealed bids for a given lot
+        fn get_revealed_bids(self: @ContractState, lot_id: u256) -> Array<(ContractAddress, u256, felt252)> {
+            let mut bids = ArrayTrait::new();
+            let count = self.revealed_bids_count.read(lot_id);
+            let mut i = 0;
+            while i < count {
+                let bid = self.revealed_bids.read((lot_id, i));
+                bids.append(bid);
+                i += 1;
+            };
+            bids
         }
     }
 
